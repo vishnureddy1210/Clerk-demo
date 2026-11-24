@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff3e00" />
+      <stop offset="50%" stop-color="#ff6f29" />
+      <stop offset="100%" stop-color="#ffb703" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Dark rounded square badge background -->
+  <rect width="100" height="100" rx="24" fill="#0c1222" />
+
+  <!-- Outer flame glow -->
+  <path d="M50 14 C55 28 67 36 67 52 C67 66 56 78 50 82 C44 78 33 66 33 52 C33 42 40 32 50 14 Z" 
+        fill="url(#fireGrad)" 
+        opacity="0.9" 
+        filter="url(#glow)" />
+
+  <!-- Inner core flame (bright white-yellow) -->
+  <path d="M50 36 C54 44 60 50 60 60 C60 69 53 77 50 80 C47 77 40 69 40 60 C40 52 45 46 50 36 Z" 
+        fill="#ffffff" 
+        opacity="0.9" />
+
+  <path d="M50 48 C52 54 56 58 56 64 C56 70 51 75 50 77 C49 75 44 70 44 64 C44 58 48 54 50 48 Z" 
+        fill="#ffb703" />
+</svg>
