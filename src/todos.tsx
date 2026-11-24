@@ -102,30 +102,35 @@ export default function Todos() {
                     />
                 </div>
                 <div className="composer-footer">
-                    <div className="tag-selector">
-                        <span className="small muted">Priority:</span>
-                        {(['low', 'medium', 'high'] as const).map((p) => (
-                            <button
-                                key={p}
-                                type="button"
-                                className={`tag-pill ${priority === p ? 'active' : ''}`}
-                                style={{
-                                    borderColor: priority === p ? PRIORITY_THEME[p].color : undefined,
-                                    color: priority === p ? PRIORITY_THEME[p].color : undefined,
-                                }}
-                                onClick={() => setPriority(p)}
-                            >
-                                {PRIORITY_THEME[p].label}
-                            </button>
-                        ))}
+                    <div className="todo-controls">
+                        <div className="tag-selector">
+                            <span className="small muted">Priority:</span>
+                            {(['low', 'medium', 'high'] as const).map((p) => (
+                                <button
+                                    key={p}
+                                    type="button"
+                                    className={`tag-pill ${priority === p ? 'active' : ''}`}
+                                    style={{
+                                        borderColor: priority === p ? PRIORITY_THEME[p].color : undefined,
+                                        color: priority === p ? PRIORITY_THEME[p].color : undefined,
+                                    }}
+                                    onClick={() => setPriority(p)}
+                                >
+                                    {PRIORITY_THEME[p].label}
+                                </button>
+                            ))}
+                        </div>
 
-                        <span className="small muted" style={{ marginLeft: 8 }}>Due:</span>
-                        <input
-                            type="date"
-                            value={dueDate}
-                            onChange={(e) => setDueDate(e.target.value)}
-                            className="todo-date-input"
-                        />
+                        <div className="todo-due-group">
+                            <span className="small muted">Due:</span>
+                            <input
+                                type="date"
+                                value={dueDate}
+                                onChange={(e) => setDueDate(e.target.value)}
+                                className="todo-date-input"
+                                aria-label="Due date"
+                            />
+                        </div>
                     </div>
                     <button className="btn primary" onClick={addTodo}>
                         Add Task
@@ -165,8 +170,12 @@ export default function Todos() {
 
             {/* Task list */}
             <div className="todo-list">
-                {filtered.map((t) => (
-                    <div key={t.id} className={`todo-item ${t.completed ? 'completed' : ''}`}>
+                {filtered.map((t, index) => (
+                    <div
+                        key={t.id}
+                        className={`todo-item ${t.completed ? 'completed' : ''}`}
+                        style={{ animationDelay: `${Math.min(index * 35, 210)}ms` }}
+                    >
                         <label className="todo-check-wrapper">
                             <input
                                 type="checkbox"

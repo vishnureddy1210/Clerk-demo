@@ -4,12 +4,14 @@ import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 import Notes from './notes'
 import Todos from './todos'
 import CalendarView from './calendar'
+import { getTiltHandlers } from './tilt3d'
 
 type Tab = 'notes' | 'todos' | 'calendar'
 
 export default function App() {
     const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
     const [activeTab, setActiveTab] = useState<Tab>('notes')
+    const heroTilt = getTiltHandlers(3)
 
     useEffect(() => {
         const theme = dark ? 'dark' : 'light'
@@ -40,7 +42,7 @@ export default function App() {
             </header>
 
             <Show when="signed-out">
-                <section className="hero">
+                <section className="hero tilt-surface" {...heroTilt}>
                     <h2>Time to lock in. No distractions.</h2>
                     <p>
                         Your personal space to cook: drop your brain dumps, slay your to-dos, 
@@ -59,29 +61,38 @@ export default function App() {
 
             <Show when="signed-in">
                 {/* Navigation Bar / Tabs */}
-                <nav className="tab-navigation">
+                <nav className="tab-navigation" role="tablist" aria-label="Workspace views">
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'notes'}
                         className={`tab-btn ${activeTab === 'notes' ? 'active' : ''}`}
                         onClick={() => setActiveTab('notes')}
                     >
-                        📝 Notes & Thoughts
+                        <span className="tab-icon" aria-hidden="true">📝</span>
+                        <span className="tab-label">Notes</span>
                     </button>
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'todos'}
                         className={`tab-btn ${activeTab === 'todos' ? 'active' : ''}`}
                         onClick={() => setActiveTab('todos')}
                     >
-                        ✅ To-Do Checklist
+                        <span className="tab-icon" aria-hidden="true">✅</span>
+                        <span className="tab-label">To-Do</span>
                     </button>
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'calendar'}
                         className={`tab-btn ${activeTab === 'calendar' ? 'active' : ''}`}
                         onClick={() => setActiveTab('calendar')}
                     >
-                        📅 Calendar & Events
+                        <span className="tab-icon" aria-hidden="true">📅</span>
+                        <span className="tab-label">Calendar</span>
                     </button>
                 </nav>
 
-                {/* View switcher */}
-                <main className="tab-content">
+                {/* View switcher with smooth 3D entrance on tab switch */}
+                <main key={activeTab} className="tab-content view-enter">
                     {activeTab === 'notes' && <Notes />}
                     {activeTab === 'todos' && <Todos />}
                     {activeTab === 'calendar' && <CalendarView />}

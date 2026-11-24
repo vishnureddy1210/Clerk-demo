@@ -46,19 +46,31 @@ header h1 {
 .btn {
     white-space: nowrap;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 9px;
     border: 1px solid var(--border);
     background: var(--card);
     color: var(--text);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    box-shadow: 0 2px 0 var(--border), 0 3px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.16s ease,
+                border-color 0.16s ease,
+                background-color 0.16s ease,
+                color 0.16s ease;
 }
 
 .btn:hover {
     border-color: var(--accent);
     color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 var(--border), 0 6px 12px rgba(0, 0, 0, 0.07);
+}
+
+.btn:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 0 0 var(--border), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn:focus-visible,
@@ -69,17 +81,24 @@ textarea:focus-visible {
 }
 
 .btn.primary {
-    background: var(--accent);
+    background: linear-gradient(180deg, #ff7e3d 0%, var(--accent) 100%);
     border-color: var(--accent);
     color: var(--accent-text);
     font-weight: 600;
-    box-shadow: 0 2px 4px rgba(255, 111, 41, 0.25);
+    box-shadow: 0 3px 0 #c94a0f, 0 6px 14px rgba(255, 111, 41, 0.28);
 }
 
 .btn.primary:hover {
-    background: var(--accent-hover);
+    background: linear-gradient(180deg, #ff8a4f 0%, var(--accent-hover) 100%);
     border-color: var(--accent-hover);
     color: #ffffff;
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 0 #c94a0f, 0 8px 18px rgba(255, 111, 41, 0.36);
+}
+
+.btn.primary:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 1px 0 #c94a0f, 0 2px 6px rgba(255, 111, 41, 0.25);
 }
 
 .btn.small {
@@ -112,9 +131,9 @@ textarea {
     margin-bottom: 24px;
     background: var(--card);
     padding: 6px;
-    border-radius: 12px;
+    border-radius: 14px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     overflow-x: auto;
 }
 
@@ -127,22 +146,148 @@ textarea {
     color: var(--muted);
     font-size: 14px;
     font-weight: 600;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
     white-space: nowrap;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .tab-btn:hover {
     color: var(--text);
     background: var(--bg);
+    transform: translateY(-1px);
+}
+
+.tab-btn:active {
+    transform: scale(0.97);
 }
 
 .tab-btn.active {
-    background: var(--primary-blue);
+    background: linear-gradient(180deg, #3b82f6 0%, var(--primary-blue) 100%);
     color: #ffffff;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 #1d4ed8, 0 6px 14px rgba(37, 99, 235, 0.32);
+}
+
+.tab-content {
+    perspective: 1200px;
+}
+
+/* ================== 3D Tilt Surfaces & Animations ================== */
+.tilt-surface {
+    position: relative;
+    overflow: hidden;
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.22s ease,
+                border-color 0.22s ease,
+                background-color 0.22s ease;
+    will-change: transform;
+}
+
+.tilt-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        circle 260px at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.22),
+        transparent 65%
+    );
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 1;
+}
+
+:root[data-theme='dark'] .tilt-surface::before {
+    background: radial-gradient(
+        circle 260px at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.08),
+        transparent 65%
+    );
+}
+
+.tilt-surface > * {
+    position: relative;
+    z-index: 2;
+}
+
+@media (hover: hover) {
+    .tilt-surface:hover::before {
+        opacity: 1;
+    }
+}
+
+.view-enter {
+    animation: viewEnter3D 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    transform-origin: top center;
+}
+
+.month-enter {
+    animation: monthEnter3D 0.28s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.edit-enter {
+    animation: editFlipIn 0.26s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes viewEnter3D {
+    from {
+        opacity: 0;
+        transform: perspective(1000px) rotateX(4deg) translateY(14px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+    }
+}
+
+@keyframes cardEnter3D {
+    from {
+        opacity: 0;
+        transform: perspective(850px) rotateX(8deg) translateY(16px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: perspective(850px) rotateX(0deg) translateY(0) scale(1);
+    }
+}
+
+@keyframes monthEnter3D {
+    from {
+        opacity: 0;
+        transform: perspective(900px) rotateY(-4deg) translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: perspective(900px) rotateY(0deg) translateX(0);
+    }
+}
+
+@keyframes editFlipIn {
+    from {
+        opacity: 0;
+        transform: perspective(700px) rotateX(-6deg) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: perspective(700px) rotateX(0deg) scale(1);
+    }
+}
+
+@keyframes checkPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.26); }
+    100% { transform: scale(1); }
 }
 
 .hero {
@@ -150,8 +295,8 @@ textarea {
     padding: 70px 20px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06), 0 3px 0 var(--border);
 }
 
 .hero h2 {
@@ -222,17 +367,19 @@ textarea {
 .composer-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    transition: border-color 0.2s;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05), 0 3px 0 var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .composer-card:focus-within {
     border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(255, 111, 41, 0.1), 0 3px 0 var(--accent);
 }
 
 .composer-title {
@@ -281,7 +428,7 @@ textarea {
 }
 
 .tag-pill {
-    padding: 4px 10px;
+    padding: 4px 11px;
     font-size: 12px;
     font-weight: 600;
     border-radius: 12px;
@@ -289,12 +436,24 @@ textarea {
     border: 1px solid var(--border);
     color: var(--muted);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.16s ease,
+                border-color 0.16s ease,
+                color 0.16s ease;
+}
+
+.tag-pill:hover {
+    transform: translateY(-1px);
+}
+
+.tag-pill:active {
+    transform: scale(0.95);
 }
 
 .tag-pill.active {
     background: var(--card);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 0 var(--border), 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .tag-filters {
@@ -313,14 +472,29 @@ textarea {
     font-size: 13px;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s;
+    box-shadow: 0 2px 0 var(--border);
+    transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.16s ease,
+                background-color 0.16s ease,
+                color 0.16s ease,
+                border-color 0.16s ease;
+}
+
+.tag-filter-btn:hover {
+    transform: translateY(-1px);
+    color: var(--text);
+}
+
+.tag-filter-btn:active {
+    transform: translateY(1px) scale(0.97);
 }
 
 .tag-filter-btn.active {
-    background: var(--primary-blue);
+    background: linear-gradient(180deg, #3b82f6 0%, var(--primary-blue) 100%);
     color: #ffffff;
     border-color: var(--primary-blue);
     font-weight: 600;
+    box-shadow: 0 2px 0 #1d4ed8, 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 .notes-grid {
@@ -328,29 +502,40 @@ textarea {
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 18px;
     list-style: none;
+    perspective: 1200px;
 }
 
 .note-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 16px;
     display: flex;
     flex-direction: column;
     min-height: 160px;
-    position: relative;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04), 0 3px 0 var(--border);
+    animation: cardEnter3D 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .note-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1), 0 4px 0 var(--border);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+.note-card.is-editing {
+    transform: none !important;
+    border-color: var(--accent);
+    box-shadow: 0 12px 26px rgba(255, 111, 41, 0.12), 0 3px 0 var(--accent);
+}
+
+.note-card.is-editing::before {
+    opacity: 0 !important;
 }
 
 .note-card.pinned {
     background: var(--pin);
     border-color: var(--pin-border);
+    box-shadow: 0 6px 16px rgba(255, 111, 41, 0.08), 0 3px 0 var(--pin-border);
 }
 
 .note-card-top {
@@ -378,13 +563,21 @@ textarea {
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 15px;
-    opacity: 0.4;
-    transition: opacity 0.15s;
+    font-size: 16px;
+    opacity: 0.45;
+    transition: opacity 0.15s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.note-card:hover .pin-action-btn,
+.pin-action-btn:hover {
+    transform: scale(1.2) rotate(-10deg);
+}
+
 .pin-action-btn.is-pinned {
+    opacity: 1;
+    transform: rotate(-14deg) scale(1.1);
+}
+
+.note-card:hover .pin-action-btn {
     opacity: 1;
 }
 
@@ -477,10 +670,23 @@ textarea {
     transition: width 0.3s ease;
 }
 
+.todo-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.todo-due-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .todo-date-input {
     width: auto;
-    padding: 4px 8px;
-    font-size: 12px;
+    padding: 5px 10px;
+    font-size: 13px;
 }
 
 .todo-list {
@@ -495,19 +701,28 @@ textarea {
     gap: 14px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 12px 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    transition: all 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.03), 0 2px 0 var(--border);
+    animation: cardEnter3D 0.3s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.2s ease,
+                border-color 0.2s ease,
+                opacity 0.25s ease,
+                background-color 0.25s ease;
 }
 
 .todo-item:hover {
     border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08), 0 3px 0 var(--border);
 }
 
 .todo-item.completed {
-    opacity: 0.65;
+    opacity: 0.68;
     background: var(--bg);
+    box-shadow: none;
+    transform: translateY(0) scale(0.99);
 }
 
 .todo-item.completed .todo-text {
@@ -518,17 +733,24 @@ textarea {
     cursor: pointer;
     display: flex;
     align-items: center;
+    padding: 4px;
 }
 
 .todo-check-wrapper input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     accent-color: var(--accent);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.todo-check-wrapper input[type="checkbox"]:checked {
+    animation: checkPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .todo-content {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -538,12 +760,14 @@ textarea {
     font-size: 15px;
     font-weight: 500;
     color: var(--text);
+    word-break: break-word;
 }
 
 .todo-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .todo-delete-btn {
@@ -571,9 +795,9 @@ textarea {
 .calendar-sidebar-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04), 0 3px 0 var(--border);
 }
 
 .calendar-nav-header {
@@ -588,6 +812,7 @@ textarea {
     grid-template-columns: repeat(7, 1fr);
     gap: 8px;
     text-align: center;
+    perspective: 900px;
 }
 
 .calendar-day-header {
@@ -600,6 +825,8 @@ textarea {
 
 .calendar-cell {
     aspect-ratio: 1;
+    min-width: 0;
+    overflow: hidden;
     border-radius: 10px;
     border: 1px solid var(--border);
     padding: 6px;
@@ -608,18 +835,32 @@ textarea {
     justify-content: space-between;
     cursor: pointer;
     background: var(--card);
-    transition: all 0.15s ease;
+    box-shadow: 0 2px 0 var(--border);
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.18s ease,
+                border-color 0.18s ease,
+                background-color 0.18s ease;
 }
 
 .calendar-cell:hover {
     border-color: var(--primary-blue);
     background: var(--primary-blue-soft);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 0 var(--border), 0 8px 14px rgba(37, 99, 235, 0.12);
+    z-index: 2;
+}
+
+.calendar-cell:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 1px 0 var(--border);
 }
 
 .calendar-cell.selected {
     border-color: var(--accent);
     background: var(--pin);
     font-weight: 700;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 var(--pin-border), 0 6px 14px rgba(255, 111, 41, 0.16);
 }
 
 .calendar-cell.today {
@@ -653,6 +894,8 @@ textarea {
     border: none;
     cursor: default;
     background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 .cal-add-form {
@@ -681,16 +924,25 @@ textarea {
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: 10px;
     background: var(--bg);
     border: 1px solid var(--border);
     gap: 8px;
+    box-shadow: 0 2px 0 var(--border);
+    animation: cardEnter3D 0.25s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    transition: transform 0.16s ease, border-color 0.16s ease;
+}
+
+.cal-event-item:hover {
+    transform: translateY(-1px);
+    border-color: var(--primary-blue);
 }
 
 .cal-event-info {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 1;
     min-width: 0;
 }
 
@@ -713,6 +965,15 @@ textarea {
     margin-bottom: 12px;
 }
 
+/* Always reveal action buttons on touch devices */
+@media (hover: none) {
+    .note-hover-actions,
+    .pin-action-btn,
+    .todo-delete-btn {
+        opacity: 1;
+    }
+}
+
 @media (max-width: 768px) {
     .calendar-layout {
         grid-template-columns: 1fr;
@@ -722,7 +983,7 @@ textarea {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-wrap {
         max-width: 100%;
     }
@@ -731,7 +992,238 @@ textarea {
         grid-template-columns: 1fr;
     }
 
-    .note-hover-actions {
+    .note-hover-actions,
+    .pin-action-btn,
+    .todo-delete-btn {
         opacity: 1;
+    }
+}
+
+@media (max-width: 560px) {
+    .app {
+        padding: 16px 12px 48px;
+    }
+
+    header {
+        gap: 10px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+    }
+
+    .brand-group {
+        gap: 8px;
+        min-width: 0;
+    }
+
+    header h1 {
+        font-size: 20px;
+        gap: 6px;
+    }
+
+    /* Prevent iOS auto-zoom on form inputs */
+    input,
+    textarea {
+        font-size: 16px;
+    }
+
+    .tab-navigation {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 5px;
+        margin-bottom: 18px;
+        overflow-x: visible;
+    }
+
+    .tab-btn {
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+        padding: 8px 4px;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: normal;
+    }
+
+    .tab-icon {
+        font-size: 16px;
+    }
+
+    .hero {
+        padding: 36px 16px;
+    }
+
+    .hero h2 {
+        font-size: 26px;
+    }
+
+    .hero p {
+        font-size: 15px;
+    }
+
+    .hero .actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .hero .actions .btn {
+        width: 100%;
+        padding: 11px 16px;
+    }
+
+    .greet {
+        font-size: 22px;
+    }
+
+    .composer-card {
+        padding: 14px;
+    }
+
+    .composer-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .composer-footer .btn.primary {
+        width: 100%;
+        padding: 11px 16px;
+    }
+
+    .tag-filters {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+
+    .tag-filter-btn {
+        padding: 6px 12px;
+        font-size: 12.5px;
+    }
+
+    .note-card {
+        min-height: auto;
+        padding: 14px;
+    }
+
+    .todos-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .progress-badge {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .progress-badge span {
+        text-align: left;
+    }
+
+    .todo-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .todo-date-input {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .todo-item {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .calendar-main-card,
+    .calendar-sidebar-card {
+        padding: 14px 12px;
+    }
+
+    .calendar-nav-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .calendar-nav-header h2 {
+        font-size: 19px;
+    }
+
+    .calendar-nav-header .actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    .calendar-grid {
+        gap: 4px;
+    }
+
+    .calendar-day-header {
+        font-size: 11px;
+        padding: 6px 0;
+    }
+
+    .calendar-cell {
+        padding: 4px 2px;
+        border-radius: 8px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 4px;
+    }
+
+    .cell-day-num {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .cell-dot {
+        width: 5px;
+        height: 5px;
+    }
+
+    .cal-event-item {
+        align-items: flex-start;
+    }
+
+    .cal-event-info {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .cal-event-text {
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .empty {
+        padding: 40px 12px;
+    }
+}
+
+/* Respect reduced motion preferences and disable 3D hover tilt on touchscreens */
+@media (hover: none) {
+    .tilt-surface {
+        transform: none !important;
+    }
+
+    .tilt-surface:active {
+        transform: scale(0.985) !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        transform: none !important;
     }
 }

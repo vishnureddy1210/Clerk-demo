@@ -96,7 +96,7 @@ export default function CalendarView() {
                         </div>
                     </div>
 
-                    <div className="calendar-grid">
+                    <div key={`${year}-${month}`} className="calendar-grid month-enter">
                         {daysOfWeek.map((d) => (
                             <div key={d} className="calendar-day-header">{d}</div>
                         ))}
@@ -176,7 +176,7 @@ export default function CalendarView() {
                     </div>
 
                     {/* Day Events list */}
-                    <div className="cal-event-list">
+                    <div key={selectedDate} className="cal-event-list view-enter">
                         {selectedEvents.length === 0 ? (
                             <p className="muted small" style={{ textAlign: 'center', marginTop: 24 }}>
                                 No events scheduled for this day.

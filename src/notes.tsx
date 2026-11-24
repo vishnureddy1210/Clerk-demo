@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/react'
+import { getTiltHandlers } from './tilt3d'
 
 export type NoteTag = 'work' | 'personal' | 'ideas' | 'urgent'
 
@@ -235,13 +236,18 @@ export default function Notes() {
 
             {/* Notes Grid */}
             <div className="notes-grid">
-                {filtered.map((n) => (
+                {filtered.map((n, index) => {
+                    const isEditing = editId === n.id
+                    const cardTilt = getTiltHandlers(4.5, isEditing)
+                    return (
                     <div
                         key={n.id}
-                        className={`note-card ${n.pinned ? 'pinned' : ''}`}
+                        className={`note-card tilt-surface ${n.pinned ? 'pinned' : ''} ${isEditing ? 'is-editing' : ''}`}
+                        style={{ animationDelay: `${Math.min(index * 40, 240)}ms` }}
+                        {...cardTilt}
                     >
-                        {editId === n.id ? (
-                            <div className="edit-form">
+                        {isEditing ? (
+                            <div className="edit-form edit-enter">
                                 <input
                                     className="composer-title"
                                     value={editTitle}
@@ -322,7 +328,8 @@ export default function Notes() {
                             </>
                         )}
                     </div>
-                ))}
+                    )
+                })}
             </div>
         </div>
     )
