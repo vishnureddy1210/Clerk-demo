@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/react": "^6.19.5",
+    "@supabase/supabase-js": "^2.119.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

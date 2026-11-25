@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useUser } from '@clerk/react'
+import { useSupabaseSync } from './useSupabaseSync'
 
 type CalendarEvent = {
     id: number
@@ -17,31 +18,16 @@ const TYPE_CONFIG = {
 
 export default function CalendarView() {
     const { user } = useUser()
-    const storageKey = `calendar_events_${user?.id}`
+    const { items: events, loading, addItem, removeItem } =
+        useSupabaseSync<CalendarEvent>('calendar_events', user?.id)
 
     const [currentDate, setCurrentDate] = useState(new Date())
-    const [events, setEvents] = useState<CalendarEvent[]>([])
     const [selectedDate, setSelectedDate] = useState<string>(() => {
         const d = new Date()
         return d.toISOString().split('T')[0]
     })
     const [newEventTitle, setNewEventTitle] = useState('')
     const [newEventType, setNewEventType] = useState<'event' | 'deadline' | 'meeting' | 'reminder'>('event')
-    const [loaded, setLoaded] = useState(false)
-
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem(storageKey)
-            if (saved) setEvents(JSON.parse(saved))
-        } catch {
-            setEvents([])
-        }
-        setLoaded(true)
-    }, [storageKey])
-
-    useEffect(() => {
-        if (loaded) localStorage.setItem(storageKey, JSON.stringify(events))
-    }, [events, loaded, storageKey])
 
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
@@ -65,12 +51,12 @@ export default function CalendarView() {
             date: selectedDate,
             type: newEventType,
         }
-        setEvents([newEv, ...events])
+        addItem(newEv)
         setNewEventTitle('')
     }
 
     function deleteEvent(id: number) {
-        setEvents(events.filter((e) => e.id !== id))
+        removeItem(id)
     }
 
     const monthNames = [
@@ -81,6 +67,15 @@ export default function CalendarView() {
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
     const selectedEvents = events.filter((e) => e.date === selectedDate)
+
+    if (loading) {
+        return (
+            <div className="empty">
+                <div className="big">⏳</div>
+                <p>Loading your calendar...</p>
+            </div>
+        )
+    }
 
     return (
         <div className="calendar-container">

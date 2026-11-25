@@ -1,8 +1,8 @@
 # 🔥 Lock In — The No-Cap Productivity Suite
 
-An interactive, all-in-one personal productivity workspace with **3D depth**, **tactile transitions**, and a clean mobile-first layout. Features **Rich Notes**, an **Interactive To-Do Checklist**, and a **Smart Calendar & Events Manager** — all powered by [Clerk](https://clerk.com) for authentication.
+An interactive, all-in-one personal productivity workspace with **3D depth**, **tactile transitions**, and a clean mobile-first layout. Features **Rich Notes**, an **Interactive To-Do Checklist**, and a **Smart Calendar & Events Manager** — powered by [Clerk](https://clerk.com) for authentication and [Supabase](https://supabase.com) for real-time cloud sync across all browsers and devices.
 
-Each user gets their own private workspace stored per-account in the browser's `localStorage`.
+Each user gets their own private workspace synced per-account in Supabase PostgreSQL.
 
 ---
 
@@ -49,6 +49,7 @@ Each user gets their own private workspace stored per-account in the browser's `
 | [Vite](https://vite.dev) | 6.0.0+ | Fast build tool & hot module replacement |
 | [TypeScript](https://www.typescriptlang.org) | ~5.7.0 | Strict static type checking |
 | [Clerk React SDK](https://clerk.com/docs) | 6.19.5 | User authentication & session management |
+| [Supabase JS](https://supabase.com/docs) | 2.x | Cloud PostgreSQL database for cross-device sync |
 | [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react) | 4.4.0 | React JSX support in Vite |
 
 ---
@@ -73,6 +74,8 @@ d:\Logcheck\
     ├── app.css           # All styling: 3D tilt, transitions, layout, responsive
     ├── index.css         # Theme tokens (iET SA palette) & base reset
     ├── tilt3d.ts         # Lightweight pointer-tilt handler (CSS variable driven)
+    ├── supabaseClient.ts # Supabase client initialization
+    ├── useSupabaseSync.ts# Reusable cloud sync hook for Notes, To-Dos & Calendar
     ├── notes.tsx         # Notes view — grid, tags, search, pin, 3D tilt cards
     ├── todos.tsx         # To-Do view — checklists, progress, priorities
     └── calendar.tsx      # Calendar view — month grid, day event sidebar
@@ -85,15 +88,41 @@ d:\Logcheck\
 ### 1. Prerequisites
 - **Node.js** v20.9.0 or higher (`node -v`)
 - **Clerk Account** — free API keys from [clerk.com](https://clerk.com)
+- **Supabase Account** — free PostgreSQL project from [supabase.com](https://supabase.com)
 
-### 2. Environment Setup
+### 2. Supabase Database Setup
+In your Supabase project's **SQL Editor**, run the following SQL to create the tables for Notes, To-Dos, and Calendar Events:
+
+```sql
+create table if not exists notes (
+  id bigint primary key,
+  user_id text not null,
+  data jsonb not null
+);
+
+create table if not exists todos (
+  id bigint primary key,
+  user_id text not null,
+  data jsonb not null
+);
+
+create table if not exists calendar_events (
+  id bigint primary key,
+  user_id text not null,
+  data jsonb not null
+);
+```
+
+### 3. Environment Setup
 Create a `.env.local` file in the project root:
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxxxxx
+VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
-> ⚠️ Use the **Publishable Key** (starts with `pk_`), not the Secret Key (`sk_`).
+> ⚠️ Use the Clerk **Publishable Key** (starts with `pk_`), not the Secret Key (`sk_`).
 
-### 3. Install & Run
+### 4. Install & Run
 ```bash
 npm install
 npm run dev
@@ -116,7 +145,10 @@ Open **http://localhost:5173** in your browser.
 
 1. Push your code to GitHub.
 2. Go to [vercel.com/new](https://vercel.com/new) and import your repository.
-3. Add the environment variable `VITE_CLERK_PUBLISHABLE_KEY` in **Settings → Environment Variables**.
+3. Add these environment variables in **Settings → Environment Variables**:
+   - `VITE_CLERK_PUBLISHABLE_KEY`
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
 4. Deploy — Vercel auto-detects Vite and uses the included `vercel.json` for SPA routing.
 
 ---

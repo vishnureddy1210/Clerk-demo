@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useUser } from '@clerk/react'
 import { getTiltHandlers } from './tilt3d'
+import { useSupabaseSync } from './useSupabaseSync'
 
 export type NoteTag = 'work' | 'personal' | 'ideas' | 'urgent'
 
@@ -31,9 +32,9 @@ function timeAgo(time: number) {
 
 export default function Notes() {
     const { user } = useUser()
-    const storageKey = `notes_${user?.id}`
+    const { items: notes, loading, addItem, updateItem, removeItem } =
+        useSupabaseSync<Note>('notes', user?.id)
 
-    const [notes, setNotes] = useState<Note[]>([])
     const [title, setTitle] = useState('')
     const [text, setText] = useState('')
     const [tag, setTag] = useState<NoteTag>('ideas')
@@ -46,38 +47,6 @@ export default function Notes() {
     const [editText, setEditText] = useState('')
     const [editTag, setEditTag] = useState<NoteTag>('ideas')
 
-    const [loaded, setLoaded] = useState(false)
-
-    // Load saved notes with backward compatibility
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem(storageKey)
-            if (saved) {
-                const list = JSON.parse(saved)
-                setNotes(
-                    list.map((n: any) => ({
-                        id: n.id,
-                        title: n.title || '',
-                        text: n.text || '',
-                        tag: n.tag || 'ideas',
-                        pinned: Boolean(n.pinned),
-                        created: n.created || n.id,
-                    }))
-                )
-            } else {
-                setNotes([])
-            }
-        } catch {
-            setNotes([])
-        }
-        setLoaded(true)
-    }, [storageKey])
-
-    // Save notes to storage
-    useEffect(() => {
-        if (loaded) localStorage.setItem(storageKey, JSON.stringify(notes))
-    }, [notes, loaded, storageKey])
-
     function addNote() {
         if (!title.trim() && !text.trim()) return
         const now = Date.now()
@@ -89,19 +58,19 @@ export default function Notes() {
             pinned: false,
             created: now,
         }
-        setNotes([newNote, ...notes])
+        addItem(newNote)
         setTitle('')
         setText('')
     }
 
     function deleteNote(id: number) {
         if (window.confirm('Delete this note?')) {
-            setNotes(notes.filter((n) => n.id !== id))
+            removeItem(id)
         }
     }
 
     function togglePin(id: number) {
-        setNotes(notes.map((n) => (n.id === id ? { ...n, pinned: !n.pinned } : n)))
+        updateItem(id, (n) => ({ ...n, pinned: !n.pinned }))
     }
 
     function startEdit(n: Note) {
@@ -113,18 +82,14 @@ export default function Notes() {
 
     function saveEdit() {
         if (!editTitle.trim() && !editText.trim()) return
-        setNotes(
-            notes.map((n) =>
-                n.id === editId
-                    ? {
-                          ...n,
-                          title: editTitle.trim(),
-                          text: editText.trim(),
-                          tag: editTag,
-                      }
-                    : n
-            )
-        )
+        if (editId !== null) {
+            updateItem(editId, (n) => ({
+                ...n,
+                title: editTitle.trim(),
+                text: editText.trim(),
+                tag: editTag,
+            }))
+        }
         setEditId(null)
     }
 
@@ -137,6 +102,15 @@ export default function Notes() {
             return matchesSearch && matchesTag
         })
         .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.created - a.created)
+
+    if (loading) {
+        return (
+            <div className="empty">
+                <div className="big">⏳</div>
+                <p>Loading your notes...</p>
+            </div>
+        )
+    }
 
     return (
         <div className="notes-container">

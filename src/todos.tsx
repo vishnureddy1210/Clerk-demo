@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useUser } from '@clerk/react'
+import { useSupabaseSync } from './useSupabaseSync'
 
 export type TodoItem = {
     id: number
@@ -18,28 +19,13 @@ const PRIORITY_THEME = {
 
 export default function Todos() {
     const { user } = useUser()
-    const storageKey = `todos_${user?.id}`
+    const { items: todos, loading, addItem, updateItem, removeItem } =
+        useSupabaseSync<TodoItem>('todos', user?.id)
 
-    const [todos, setTodos] = useState<TodoItem[]>([])
     const [text, setText] = useState('')
     const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium')
     const [dueDate, setDueDate] = useState('')
     const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
-    const [loaded, setLoaded] = useState(false)
-
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem(storageKey)
-            if (saved) setTodos(JSON.parse(saved))
-        } catch {
-            setTodos([])
-        }
-        setLoaded(true)
-    }, [storageKey])
-
-    useEffect(() => {
-        if (loaded) localStorage.setItem(storageKey, JSON.stringify(todos))
-    }, [todos, loaded, storageKey])
 
     function addTodo() {
         if (!text.trim()) return
@@ -51,19 +37,17 @@ export default function Todos() {
             dueDate: dueDate || undefined,
             created: Date.now(),
         }
-        setTodos([newTodo, ...todos])
+        addItem(newTodo)
         setText('')
         setDueDate('')
     }
 
     function toggleTodo(id: number) {
-        setTodos(
-            todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-        )
+        updateItem(id, (t) => ({ ...t, completed: !t.completed }))
     }
 
     function deleteTodo(id: number) {
-        setTodos(todos.filter((t) => t.id !== id))
+        removeItem(id)
     }
 
     const completedCount = todos.filter((t) => t.completed).length
@@ -74,6 +58,15 @@ export default function Todos() {
         if (filter === 'completed') return t.completed
         return true
     })
+
+    if (loading) {
+        return (
+            <div className="empty">
+                <div className="big">⏳</div>
+                <p>Loading your tasks...</p>
+            </div>
+        )
+    }
 
     return (
         <div className="todos-container">
