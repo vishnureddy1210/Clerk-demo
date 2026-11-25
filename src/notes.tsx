@@ -252,7 +252,7 @@ export default function Notes() {
                                         </button>
                                     ))}
                                 </div>
-                                <div className="actions" style={{ justifyContent: 'flex-end', marginTop: 10 }}>
+                                <div className="actions edit-actions">
                                     <button className="btn primary small" onClick={saveEdit}>
                                         Save changes
                                     </button>

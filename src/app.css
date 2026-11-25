@@ -512,6 +512,7 @@ textarea {
     padding: 16px;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     min-height: 160px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04), 0 3px 0 var(--border);
     animation: cardEnter3D 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
@@ -595,6 +596,7 @@ textarea {
     line-height: 1.55;
     flex: 1;
     word-break: break-word;
+    overflow-wrap: anywhere;
     opacity: 0.92;
     margin-bottom: 12px;
 }
@@ -625,6 +627,11 @@ textarea {
     gap: 6px;
     flex-wrap: wrap;
     margin-top: 4px;
+}
+
+.edit-actions {
+    justify-content: flex-end;
+    margin-top: 10px;
 }
 
 /* ================== To-Do Checklist View ================== */
@@ -988,7 +995,7 @@ textarea {
     }
 
     .notes-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .note-hover-actions,
@@ -1000,7 +1007,7 @@ textarea {
 
 @media (max-width: 560px) {
     .app {
-        padding: 16px 12px 48px;
+        padding: 16px 12px calc(48px + env(safe-area-inset-bottom, 0px));
     }
 
     header {
@@ -1211,7 +1218,7 @@ textarea {
         transform: none !important;
     }
 
-    .tilt-surface:active {
+    .tilt-surface:not(.is-editing):active {
         transform: scale(0.985) !important;
     }
 }
@@ -1232,6 +1239,8 @@ textarea {
 .re-wrap {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    width: 100%;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--card);
@@ -1310,9 +1319,41 @@ textarea {
     border-color: var(--accent-hover);
 }
 
+/* Inline Link Bar */
+.re-link-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-wrap: wrap;
+}
+
+.re-link-input {
+    flex: 1;
+    min-width: 180px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.re-link-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.re-link-error {
+    width: 100%;
+    font-size: 12px;
+    color: #ef4444;
+    font-weight: 500;
+}
+
 /* Editor content area */
 .re-editor {
     flex: 1;
+    min-width: 0;
 }
 
 .re-editor .tiptap {
@@ -1440,20 +1481,92 @@ textarea {
     margin: 0.3em 0;
 }
 
-/* Mobile: prevent toolbar wrapping from being too tight and prevent iOS zoom */
-@media (max-width: 560px) {
+/* Mobile & touch: single-row swipeable toolbar, larger tap targets, iOS zoom prevention */
+@media (max-width: 640px), (hover: none) and (pointer: coarse) {
     .re-toolbar {
-        gap: 1px;
-        padding: 5px 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 4px;
+        padding: 6px 8px;
+        scroll-padding-inline: 8px;
+    }
+
+    .re-toolbar::-webkit-scrollbar {
+        display: none;
     }
 
     .re-btn {
-        min-width: 26px;
-        height: 26px;
-        font-size: 12px;
+        flex-shrink: 0;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 8px;
+        font-size: 14px;
+    }
+
+    .re-btn:hover:not(:disabled) {
+        transform: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .re-editor {
+        max-height: 42dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .re-editor .tiptap {
         font-size: 16px;
+        padding: 12px;
+    }
+
+    .re-link-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .re-link-input {
+        min-width: 0;
+        font-size: 16px;
+        padding: 8px 10px;
+    }
+
+    .re-link-actions {
+        display: flex;
+    }
+
+    .re-link-actions .btn {
+        flex: 1;
+        min-height: 36px;
+    }
+
+    .tag-pill {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .pin-action-btn {
+        min-width: 36px;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .note-hover-actions .btn {
+        min-height: 38px;
+        padding: 6px 14px;
+    }
+
+    .edit-actions {
+        gap: 8px;
+    }
+
+    .edit-actions .btn {
+        flex: 1;
+        min-height: 40px;
     }
 }
