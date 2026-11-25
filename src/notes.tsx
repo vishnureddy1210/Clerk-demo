@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useUser } from '@clerk/react'
 import { getTiltHandlers } from './tilt3d'
 import { useSupabaseSync } from './useSupabaseSync'
+import RichEditor, { getPlainNoteText, normalizeNoteHtml } from './RichEditor'
 
 export type NoteTag = 'work' | 'personal' | 'ideas' | 'urgent'
 
@@ -48,12 +49,12 @@ export default function Notes() {
     const [editTag, setEditTag] = useState<NoteTag>('ideas')
 
     function addNote() {
-        if (!title.trim() && !text.trim()) return
+        if (!title.trim() && !getPlainNoteText(text)) return
         const now = Date.now()
         const newNote: Note = {
             id: now,
             title: title.trim(),
-            text: text.trim(),
+            text,
             tag,
             pinned: false,
             created: now,
@@ -76,17 +77,17 @@ export default function Notes() {
     function startEdit(n: Note) {
         setEditId(n.id)
         setEditTitle(n.title)
-        setEditText(n.text)
+        setEditText(normalizeNoteHtml(n.text))
         setEditTag(n.tag || 'ideas')
     }
 
     function saveEdit() {
-        if (!editTitle.trim() && !editText.trim()) return
+        if (!editTitle.trim() && !getPlainNoteText(editText)) return
         if (editId !== null) {
             updateItem(editId, (n) => ({
                 ...n,
                 title: editTitle.trim(),
-                text: editText.trim(),
+                text: editText,
                 tag: editTag,
             }))
         }
@@ -95,9 +96,10 @@ export default function Notes() {
 
     const filtered = notes
         .filter((n) => {
+            const plainText = getPlainNoteText(n.text)
             const matchesSearch =
                 n.title.toLowerCase().includes(search.toLowerCase()) ||
-                n.text.toLowerCase().includes(search.toLowerCase())
+                plainText.toLowerCase().includes(search.toLowerCase())
             const matchesTag = selectedTag === 'all' || n.tag === selectedTag
             return matchesSearch && matchesTag
         })
@@ -142,12 +144,11 @@ export default function Notes() {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Note Title..."
                 />
-                <textarea
-                    className="composer-body"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    rows={3}
+                <RichEditor
+                    content={text}
+                    onChange={setText}
                     placeholder="Take a note, capture thoughts, or paste links..."
+                    minHeight={90}
                 />
                 <div className="composer-footer">
                     <div className="tag-selector">
@@ -229,12 +230,11 @@ export default function Notes() {
                                     placeholder="Title"
                                     autoFocus
                                 />
-                                <textarea
-                                    className="composer-body"
-                                    value={editText}
-                                    onChange={(e) => setEditText(e.target.value)}
-                                    rows={4}
+                                <RichEditor
+                                    content={editText}
+                                    onChange={setEditText}
                                     placeholder="Content"
+                                    minHeight={110}
                                 />
                                 <div className="edit-tag-row">
                                     {(['ideas', 'work', 'personal', 'urgent'] as NoteTag[]).map((t) => (
@@ -288,7 +288,10 @@ export default function Notes() {
                                 </div>
 
                                 {n.title && <h3 className="note-title">{n.title}</h3>}
-                                <p className="note-text">{n.text}</p>
+                                <div
+                                    className="note-text"
+                                    dangerouslySetInnerHTML={{ __html: normalizeNoteHtml(n.text) }}
+                                />
 
                                 {/* Action bar visible on hover */}
                                 <div className="note-hover-actions">

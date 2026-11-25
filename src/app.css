@@ -592,11 +592,10 @@ textarea {
 .note-text {
     font-size: 14px;
     color: var(--text);
-    line-height: 1.5;
+    line-height: 1.55;
     flex: 1;
-    white-space: pre-wrap;
     word-break: break-word;
-    opacity: 0.9;
+    opacity: 0.92;
     margin-bottom: 12px;
 }
 
@@ -1225,5 +1224,236 @@ textarea {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         transform: none !important;
+    }
+}
+
+
+/* ================== Rich Text Editor (Tiptap) ================== */
+.re-wrap {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    overflow: hidden;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.re-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(255, 111, 41, 0.14);
+}
+
+/* Toolbar */
+.re-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-wrap: wrap;
+}
+
+.re-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+.re-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease, transform 0.14s ease;
+    line-height: 1;
+}
+
+.re-btn:hover:not(:disabled) {
+    background: var(--card);
+    color: var(--text);
+    border-color: var(--border);
+    transform: translateY(-1px);
+}
+
+.re-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.95);
+}
+
+.re-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.re-btn--active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.re-btn--active:hover:not(:disabled) {
+    background: var(--accent-hover);
+    color: #fff;
+    border-color: var(--accent-hover);
+}
+
+/* Editor content area */
+.re-editor {
+    flex: 1;
+}
+
+.re-editor .tiptap {
+    min-height: var(--re-min-h, 80px);
+    padding: 10px 12px;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    word-break: break-word;
+}
+
+/* Placeholder */
+.re-editor .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    color: var(--muted);
+    pointer-events: none;
+    float: left;
+    height: 0;
+    opacity: 0.7;
+}
+
+/* Rendered content typography */
+.re-editor .tiptap h1 { font-size: 1.35em; font-weight: 700; margin: 0.6em 0 0.3em; }
+.re-editor .tiptap h2 { font-size: 1.15em; font-weight: 700; margin: 0.5em 0 0.25em; }
+.re-editor .tiptap h3 { font-size: 1em;    font-weight: 700; margin: 0.4em 0 0.2em; }
+.re-editor .tiptap p  { margin: 0.25em 0; }
+
+.re-editor .tiptap ul,
+.re-editor .tiptap ol {
+    padding-left: 1.4em;
+    margin: 0.3em 0;
+}
+
+.re-editor .tiptap li + li { margin-top: 0.1em; }
+.re-editor .tiptap li p { margin: 0; }
+
+.re-editor .tiptap hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0.7em 0;
+}
+
+.re-editor .tiptap blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+    margin: 0.5em 0;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.re-editor .tiptap code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.88em;
+}
+
+.re-editor .tiptap pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 0.5em 0;
+}
+
+.re-editor .tiptap pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.85em;
+}
+
+.re-editor .tiptap a {
+    color: var(--primary-blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.re-editor .tiptap a:hover {
+    color: var(--accent);
+}
+
+/* Note card preview of rich content */
+.note-text p  { margin: 0.2em 0; }
+.note-text ul,
+.note-text ol { padding-left: 1.3em; margin: 0.2em 0; }
+.note-text li p { margin: 0; }
+.note-text h1 { font-size: 1.25em; font-weight: 700; margin: 0.25em 0; }
+.note-text h2 { font-size: 1.1em;  font-weight: 700; margin: 0.2em 0; }
+.note-text h3 { font-size: 1em;    font-weight: 700; margin: 0.2em 0; }
+.note-text hr { border: none; border-top: 1px solid var(--border); margin: 0.5em 0; }
+.note-text a  { color: var(--primary-blue); text-decoration: underline; text-underline-offset: 2px; }
+.note-text code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 0.85em;
+}
+.note-text pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    font-size: 0.82em;
+    white-space: pre-wrap;
+    margin: 0.35em 0;
+}
+.note-text pre code {
+    background: none;
+    border: none;
+    padding: 0;
+}
+.note-text blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 10px;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0.3em 0;
+}
+
+/* Mobile: prevent toolbar wrapping from being too tight and prevent iOS zoom */
+@media (max-width: 560px) {
+    .re-toolbar {
+        gap: 1px;
+        padding: 5px 6px;
+    }
+
+    .re-btn {
+        min-width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .re-editor .tiptap {
+        font-size: 16px;
     }
 }

@@ -11,6 +11,13 @@
   "dependencies": {
     "@clerk/react": "^6.19.5",
     "@supabase/supabase-js": "^2.119.2",
+    "@tiptap/extension-link": "^3.35.0",
+    "@tiptap/extension-placeholder": "^3.35.0",
+    "@tiptap/extension-text-align": "^3.35.0",
+    "@tiptap/extension-underline": "^3.35.0",
+    "@tiptap/pm": "^3.35.0",
+    "@tiptap/react": "^3.35.0",
+    "@tiptap/starter-kit": "^3.35.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
